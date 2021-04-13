@@ -1,24 +1,28 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { } from 'react'
+import AtrProvider from './context/atrContext';
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import 'fontsource-roboto';
+import NavBar from './components/navBar';
+import Login from './components/login';
+import ProtectedRoute from './helpers/protectedRoute'
+import Dashboard from './pages/dashboard';
+import Error404 from './pages/404';
+import { Container } from '@material-ui/core';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <AtrProvider>
+    <NavBar />
+    <Container maxWidth="sm">
+    <Router>
+      <Switch>
+        <Route exact path="/" component={Login} />
+        <ProtectedRoute path="/usuario/:id" component={Dashboard} />
+        <Route path="*" component={Error404} />
+      </Switch>
+    </Router>
+      </Container>
+  </AtrProvider>
   );
 }
 
