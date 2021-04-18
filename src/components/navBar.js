@@ -11,7 +11,7 @@ const NavBar = (props) => {
 				<Typography variant='h6'>
 					ATR App
 				</Typography>
-				<Typography variant='p' align='right'>
+				<Typography  align='right'>
 					{usuario.nombre ? `logeado como: ${usuario.nombre}` : ''}
 				</Typography>
 			</Toolbar>
