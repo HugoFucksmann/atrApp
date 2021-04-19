@@ -9,6 +9,7 @@ class AtrProvider extends Component {
 		usuario: {},
 		personas: [],
 		toogle: false,
+		busquedaUsuarios: [],
 	};
 
 	setToogle = () => {

@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import { lighten, makeStyles } from '@material-ui/core/styles';
@@ -146,8 +146,18 @@ const useToolbarStyles = makeStyles((theme) => ({
 }));
 
 const EnhancedTableToolbar = (props) => {
+	const { personas } = useContext(AtrContext);
+	const { numSelected, idPersona } = props;
 	const classes = useToolbarStyles();
-	const { numSelected, idPersona, personas } = props;
+	const [filtro, setFiltro] = useState('');
+	const [busqueda, setBusqueda] = useState([]);
+
+	function handlerBusqueda(value) {
+		let result = personas.filter((user) => {
+			return user[filtro] === value;
+		});
+		return setBusqueda(result);
+	}
 
 	const handlerEliminar = () => {
 		eliminarUserAtr(idPersona);
@@ -166,11 +176,13 @@ const EnhancedTableToolbar = (props) => {
 					color='inherit'
 					variant='subtitle1'
 					component='div'
+					key='text1'
 				>
 					{numSelected} seleccionados
 				</Typography>
 			) : (
 				<Typography
+					key='text2'
 					className={classes.title}
 					variant='h6'
 					id='tableTitle'
@@ -182,14 +194,14 @@ const EnhancedTableToolbar = (props) => {
 
 			{numSelected > 0 ? (
 				<>
-					<IconButton style={{ marginRight: 10 }}>
+					<IconButton key='icon1' style={{ marginRight: 10 }}>
 						<img
 							src={pdfIcon}
 							style={{ height: 25, width: 25 }}
 							alt='fireSpot'
 						/>
 					</IconButton>
-					<IconButton style={{ marginRight: 10 }}>
+					<IconButton key='icon2' style={{ marginRight: 10 }}>
 						<img
 							src={excelIcon}
 							style={{ height: 25, width: 25 }}
@@ -200,11 +212,13 @@ const EnhancedTableToolbar = (props) => {
 			) : (
 				<>
 					<TextField
+						key='text3'
 						size='small'
 						id='outlined-basic'
 						label='Buscar'
 						variant='outlined'
 						className={classes.searchers}
+						onChange={(e) => handlerBusqueda(e.target.value)}
 						InputProps={{
 							endAdornment: (
 								<InputAdornment position='start'>
@@ -217,6 +231,7 @@ const EnhancedTableToolbar = (props) => {
 						size='small'
 						variant='outlined'
 						className={classes.searchers}
+						key='text4'
 					>
 						<InputLabel id='demo-simple-select-outlined-label'>
 							Filtrar
@@ -225,22 +240,24 @@ const EnhancedTableToolbar = (props) => {
 							labelId='demo-simple-select-outlined-label'
 							id='demo-simple-select-outlined'
 							label='Age'
+							value={filtro}
+							onChange={(e) => setFiltro(e.target.value)}
 						>
-							<MenuItem value={10}>Ten</MenuItem>
-							<MenuItem value={20}>Twenty</MenuItem>
-							<MenuItem value={30}>Thirty</MenuItem>
+							{keys.map((key) => (
+								<MenuItem value={key}>{key}</MenuItem>
+							))}
 						</Select>
 					</FormControl>
 				</>
 			)}
 			{numSelected === 1 && (
 				<>
-					<Tooltip title='Editar' style={{ marginRight: 10 }}>
+					<Tooltip key='icon3' title='Editar' style={{ marginRight: 10 }}>
 						<IconButton aria-label='Editar' onClick={() => handlreEditar()}>
 							<EditIcon />
 						</IconButton>
 					</Tooltip>
-					<Tooltip title='Eliminar' style={{ marginRight: 10 }}>
+					<Tooltip key='icon4' title='Eliminar' style={{ marginRight: 10 }}>
 						<IconButton aria-label='Eliminar' onClick={() => handlerEliminar()}>
 							<DeleteIcon />
 						</IconButton>
@@ -278,8 +295,6 @@ const useStyles = makeStyles((theme) => ({
 		width: 1,
 	},
 }));
-
-const handlerBusqueda = (parametro, value) => {};
 
 const personaModel = {
 	nombre: '',
@@ -375,7 +390,6 @@ export default function EnhancedTable() {
 				<EnhancedTableToolbar
 					numSelected={selected.length}
 					idPersona={selected}
-					personas={personas}
 				/>
 				<TableContainer style={{ maxHeight: 550 }}>
 					<Table
@@ -448,6 +462,10 @@ export default function EnhancedTable() {
 					</Table>
 				</TableContainer>
 				<TablePagination
+					labelRowsPerPage='filas por pagina'
+					labelDisplayedRows={({ from, to, count }) =>
+						`${from}-${to} de ${count !== -1 ? count : `mas de ${to}`}`
+					}
 					rowsPerPageOptions={[5, 10, 25]}
 					component='div'
 					count={personas.length}
