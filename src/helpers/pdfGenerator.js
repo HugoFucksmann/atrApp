@@ -1,28 +1,17 @@
-import jsPDF from "jspdf";
-import "jspdf-autotable";
-import { CSVLink } from "react-csv";
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+import { CSVLink } from 'react-csv';
 
+export function generatePDF(json, keys) {
+	console.log(keys);
+	let columns = keys.map((key) => {
+		return { header: key, dataKey: key };
+	});
+	const doc = new jsPDF();
+	doc.autoTable({
+		body: json,
+		columns: columns,
+	});
 
-export function generatePDF(json){
-    const doc = new jsPDF();
-    doc.autoTable({
-      body: json,
-      columns: [
-        { header: "Taller", dataKey: "taller" },
-        { header: "Nombre", dataKey: ["nombre"] },
-        { header: "Apellido", dataKey: "apellido" },
-        { header: "DNI", dataKey: "dni" },
-        //{ header: "Edad", dataKey: "edad" },
-        { header: "Fecha Nacimiento", dataKey: "fechaNacimiento" },
-        { header: "Contacto", dataKey: "telefono" },
-        //{ header: "Calle", dataKey: "calle" },
-        //{ header: "Numero Calle", dataKey: "numeroCalle" },
-        //{ header: "Ciudad", dataKey: "ciudad" },
-      ],
-    });
-
-    doc.save("table.pdf");
-
+	doc.save('table.pdf');
 }
-
-

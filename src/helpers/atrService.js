@@ -1,17 +1,48 @@
 import axios from 'axios';
 
+function headers() {
+	return {
+		headers: {
+			'x-token': localStorage.getItem('token') || '',
+		},
+	};
+}
+
+export function miUsuarioLocal() {
+	return JSON.parse(localStorage.getItem('usuario'));
+}
+
+export async function getMyUser() {
+	let miUsuario = await axios
+		.get(`${process.env.REACT_APP_URL}/usu`, headers())
+		.then((res) => res.data.miUsuario)
+		.catch((e) => {
+			console.log(e);
+			return {};
+		});
+	return miUsuario;
+}
+
 export async function getUsersAtr() {
 	let urlSearch = `${process.env.REACT_APP_URL}/atr/usersatr`;
 	let resp = await axios.get(urlSearch).then(({ data }) => data.usuario);
-	console.log(resp.length);
+
 	return resp;
 }
 
 export async function eliminarUserAtr(id) {
 	let urlSearch = `${process.env.REACT_APP_URL}/atr/usersatr/${id}`;
 	let resp = await axios.delete(urlSearch).then(({ data }) => data);
-	console.log(resp);
-	//return resp;
+	if (resp.ok) return true;
+	else return false;
+}
+
+export async function editarUserAtr(personaEdit) {
+	let urlSearch = `${process.env.REACT_APP_URL}/atr/usersatr`;
+	let resp = await axios.put(urlSearch, personaEdit).then(({ data }) => data);
+
+	if (resp.ok) return resp.persona;
+	else return false;
 }
 
 async function actualizarArchivo(file, userAtrId) {
@@ -27,7 +58,7 @@ async function actualizarArchivo(file, userAtrId) {
 		let formData = new FormData();
 
 		formData.append('atrdni', { uri: localUri, name: filename, type });
-		console.log('aaaaaaaaaaaaaaaaaaa');
+
 		const resp = await fetch(url, {
 			method: 'PUT',
 			headers: {
@@ -39,7 +70,7 @@ async function actualizarArchivo(file, userAtrId) {
 		}).catch((e) => console.log(e));
 
 		const data = await resp.json();
-		console.log('dataaaaa ', data);
+
 		if (data.ok) {
 			return data.mascota;
 		} else {
@@ -62,40 +93,11 @@ export async function crearUserAtr(formData, file) {
 	const url = `${process.env.REACT_APP_URL}/atr/usersAtr`;
 	let userAtr = await axios.post(url, formData).then(async ({ data }) => {
 		if (data.ok) {
-			console.log('data.userAtr._id ', data.userAtr._id);
-			let result = await actualizarArchivo(file, data.userAtr._id);
-			console.log('result ', result);
-			return result;
+			//let result = await actualizarArchivo(file, data.userAtr._id);
+			//return result;
+			return data.userAtr;
 		} else return false;
 	});
 
 	return userAtr;
 }
-
-/* await NoticiasService.crearNoticia(notaDB)
-      .then( async (resp) => {
-        const id = resp.data.noticias._id;
-        actualizarArchivo(filee, 'noticias', id).catch(err => console.log(err))
-        if (isFile) {
-          await Swal.fire({
-            allowOutsideClick: false,
-            title: "Archivo de audio video o img",
-            input: "file",
-            preConfirm: (file) => {
-              actualizarArchivo(file, 'files', id)
-                .then(() => {
-                  Swal.fire("nota cargada con exito", "", "success")
-                })
-                .catch((err) => console.log(err));
-            },
-          });
-        } else {
-          Swal.fire("nota cargada con exito", "", "success");
-        }        
-        
-      })
-      .catch((err) => {
-        console.log(err.response);
-        Swal.fire("error al cargar la nota", "", "error");
-      });
-  } */

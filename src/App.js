@@ -7,12 +7,15 @@ import Login from './components/login';
 import ProtectedRoute from './helpers/protectedRoute';
 import Dashboard from './pages/dashboard';
 import Error404 from './pages/404';
-import { Container } from '@material-ui/core';
-import { getUsersAtr } from './helpers/atrService';
+import { CircularProgress, Container } from '@material-ui/core';
+import { getUsersAtr, getMyUser } from './helpers/atrService';
+import AdminDashboard from './pages/AdminDashboard';
+import Registro from './components/registro';
 
 function App() {
 	const [loading, setLoading] = useState(true);
 	const [personas, setPersonas] = useState([]);
+
 	useEffect(() => {
 		(async () => {
 			setPersonas(await getUsersAtr());
@@ -21,19 +24,28 @@ function App() {
 		})();
 	}, []);
 
-	if (loading) return <div>LOADINgGGGGG</div>;
+	if (loading)
+		return (
+			<CircularProgress
+				style={{ marginLeft: '47%', marginTop: '20%' }}
+				size={50}
+				color='secondary'
+			/>
+		);
 	return (
 		<AtrProvider personas={personas}>
-			<NavBar />
-			<Container>
-				<Router>
+			<Router>
+				<NavBar />
+				<Container>
 					<Switch>
 						<Route exact path='/' component={Login} />
+						<Route exact path='/registro' component={Registro} />
 						<ProtectedRoute path='/dashboard' component={Dashboard} />
+						<ProtectedRoute path='/admin' component={AdminDashboard} />
 						<Route path='*' component={Error404} />
 					</Switch>
-				</Router>
-			</Container>
+				</Container>
+			</Router>
 		</AtrProvider>
 	);
 }

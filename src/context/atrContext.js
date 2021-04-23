@@ -52,6 +52,7 @@ class AtrProvider extends Component {
 
 	render() {
 		this.state.personas = this.props.personas;
+		console.log(JSON.parse(localStorage.getItem('usuario')) || '');
 		return (
 			<AtrContext.Provider
 				value={{

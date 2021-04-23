@@ -34,19 +34,25 @@ const useStyles = makeStyles({
 	},
 });
 
-export default function Login(props) {
+export default function Registro(props) {
 	const [usuario, setUsuario] = useState();
 	const [password, setPassword] = useState();
+	const [nombre, setNombre] = useState();
 	const classes = useStyles();
 
 	async function handleSubmit(event) {
 		event.preventDefault();
-		auth.login(usuario, password, props);
+		await auth.crearUsuario(usuario, password, nombre, props);
 	}
 
 	return (
 		<Paper elevation={6} className={classes.loginContainer}>
 			<form className={classes.form}>
+				<TextField
+					id='standard-basic1'
+					label='Nombre'
+					onChange={(e) => setNombre(e.target.value)}
+				/>
 				<TextField
 					id='standard-basic1'
 					label='Usuario'
@@ -65,16 +71,16 @@ export default function Login(props) {
 				className={classes.root}
 				onClick={(e) => handleSubmit(e)}
 			>
-				Acceder
+				Registrarse !
 			</Button>
 			<Button
 				variant='contained'
 				color='primary'
 				size='small'
 				style={{ marginLeft: 20 }}
-				onClick={() => props.history.push('/registro')}
+				onClick={() => props.history.push('/')}
 			>
-				Registrarse
+				ir al login
 			</Button>
 		</Paper>
 	);

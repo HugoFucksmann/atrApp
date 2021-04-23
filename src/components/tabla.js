@@ -19,6 +19,8 @@ import Tooltip from '@material-ui/core/Tooltip';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import SearchIcon from '@material-ui/icons/Search';
+import { CSVLink } from 'react-csv';
+
 import { eliminarUserAtr } from '../helpers/atrService';
 import { AtrContext } from '../context/atrContext';
 import {
@@ -33,6 +35,7 @@ import {
 } from '@material-ui/core';
 import pdfIcon from '../assets/iconos/pdf.svg';
 import excelIcon from '../assets/iconos/excel.svg';
+import { generatePDF } from '../helpers/pdfGenerator';
 
 function descendingComparator(a, b, orderBy) {
 	if (b[orderBy] < a[orderBy]) {
@@ -147,7 +150,7 @@ const useToolbarStyles = makeStyles((theme) => ({
 
 const EnhancedTableToolbar = (props) => {
 	const { personas } = useContext(AtrContext);
-	const { numSelected, idPersona } = props;
+	const { numSelected, personasSelec } = props;
 	const classes = useToolbarStyles();
 	const [filtro, setFiltro] = useState('');
 	const [busqueda, setBusqueda] = useState([]);
@@ -160,7 +163,7 @@ const EnhancedTableToolbar = (props) => {
 	}
 
 	const handlerEliminar = () => {
-		eliminarUserAtr(idPersona);
+		eliminarUserAtr(personasSelec[0]._id);
 	};
 	const handlreEditar = () => {};
 
@@ -194,20 +197,27 @@ const EnhancedTableToolbar = (props) => {
 
 			{numSelected > 0 ? (
 				<>
-					<IconButton key='icon1' style={{ marginRight: 10 }}>
+					<IconButton
+						key='icon1'
+						style={{ marginRight: 10 }}
+						onClick={() => generatePDF(personasSelec, keys)}
+					>
 						<img
 							src={pdfIcon}
 							style={{ height: 25, width: 25 }}
 							alt='fireSpot'
 						/>
 					</IconButton>
-					<IconButton key='icon2' style={{ marginRight: 10 }}>
-						<img
-							src={excelIcon}
-							style={{ height: 25, width: 25 }}
-							alt='fireSpot'
-						/>
-					</IconButton>
+
+					<CSVLink data={personasSelec} filename='atrApp.csv'>
+						<IconButton key='icon2' style={{ marginRight: 10 }}>
+							<img
+								src={excelIcon}
+								style={{ height: 25, width: 25 }}
+								alt='fireSpot'
+							/>
+						</IconButton>
+					</CSVLink>
 				</>
 			) : (
 				<>
@@ -333,7 +343,7 @@ export default function EnhancedTable() {
 	const [selected, setSelected] = React.useState([]);
 	const [page, setPage] = React.useState(0);
 	const [dense, setDense] = React.useState(false);
-	const [rowsPerPage, setRowsPerPage] = React.useState(5);
+	const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
 	const handleRequestSort = (event, property) => {
 		const isAsc = orderBy === property && order === 'asc';
@@ -343,7 +353,7 @@ export default function EnhancedTable() {
 
 	const handleSelectAllClick = (event) => {
 		if (event.target.checked) {
-			const newSelecteds = personas.map((n) => n._id);
+			const newSelecteds = personas.map((n) => n);
 			setSelected(newSelecteds);
 			return;
 		}
@@ -389,7 +399,7 @@ export default function EnhancedTable() {
 			<Paper elevation={3} className={classes.paper}>
 				<EnhancedTableToolbar
 					numSelected={selected.length}
-					idPersona={selected}
+					personasSelec={selected}
 				/>
 				<TableContainer style={{ maxHeight: 550 }}>
 					<Table
@@ -411,13 +421,13 @@ export default function EnhancedTable() {
 							{stableSort(personas, getComparator(order, orderBy))
 								.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
 								.map((row, index) => {
-									const isItemSelected = isSelected(row._id);
+									const isItemSelected = isSelected(row);
 									const labelId = `enhanced-table-checkbox-${index}`;
 
 									return (
 										<TableRow
 											hover
-											onClick={(event) => handleClick(event, row._id)}
+											onClick={(event) => handleClick(event, row)}
 											role='checkbox'
 											aria-checked={isItemSelected}
 											tabIndex={-1}

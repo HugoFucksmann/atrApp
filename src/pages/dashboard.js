@@ -7,13 +7,13 @@ import {
 	Typography,
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import EnhancedTable from '../components/tabla';
+import EnhancedTable from '../components/tablaSimple';
 import Formulario from '../components/formulario';
 
 const useStyles = makeStyles({});
 
 const Dashboard = () => {
-	const [expanded, setExpanded] = React.useState(false);
+	const [expanded, setExpanded] = React.useState('panel1');
 	const handleChange = (panel) => (event, isExpanded) => {
 		setExpanded(isExpanded ? panel : false);
 	};

@@ -3,7 +3,7 @@ import { Grid, makeStyles } from '@material-ui/core';
 import { Button, Input, TextField, Typography } from '@material-ui/core';
 import imgDefault from '../assets/default_plus.png';
 import { AtrContext } from '../context/atrContext';
-import { crearUserAtr } from '../helpers/atrService';
+import { crearUserAtr, miUsuarioLocal } from '../helpers/atrService';
 import Swal from 'sweetalert2';
 
 const personaModel = {
@@ -48,12 +48,14 @@ const useStyles = makeStyles({
 const Formulario = () => {
 	const classes = useStyles();
 	const { handlerAtr, usuario } = useContext(AtrContext);
-	const [formData, setFormData] = useState({ usuarioCarga: usuario.nombre });
+	const [formData, setFormData] = useState({
+		usuarioCarga: miUsuarioLocal().uid,
+	});
 	const [image, setImage] = useState(null);
 	const [filee, setFile] = useState(null);
 
 	async function handlerCrearUserAtr() {
-		let result = await crearUserAtr(formData);
+		let result = await crearUserAtr(formData, filee);
 		if (result) {
 			handlerAtr('crear', result);
 		} else return Swal.fire('Error al crear persona :(', 'error');
@@ -70,7 +72,7 @@ const Formulario = () => {
 
 	return (
 		<Grid container>
-			<Grid xs={8}>
+			<Grid item xs={8}>
 				{keys.map((key, index) => {
 					if (key === 'fechaNacimiento')
 						return (
@@ -103,9 +105,9 @@ const Formulario = () => {
 					);
 				})}
 			</Grid>
-			<Grid xs={4}>
+			<Grid item xs={4}>
 				<Typography variant='subtitle1'>
-					Foto Documento (adelante y atras)
+					Carga foto DNI (Todavia no anda)
 				</Typography>
 				<Button
 					variant='contained'
